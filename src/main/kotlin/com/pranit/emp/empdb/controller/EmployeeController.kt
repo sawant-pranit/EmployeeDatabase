@@ -1,8 +1,11 @@
 package com.pranit.emp.empdb.controller
 
 import com.pranit.emp.empdb.entity.Employee
+import com.pranit.emp.empdb.repository.EmployeeAttendanceRepository
+import com.pranit.emp.empdb.repository.EmployeeLeaveRepository
 import com.pranit.emp.empdb.repository.EmployeeRepository
-import com.pranit.emp.empdb.service.EmployeeService
+import com.pranit.emp.empdb.repository.EmployeeSkillRepository
+import com.pranit.emp.empdb.repository.PayrollRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +20,14 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/employees")
-class EmployeeController(private val employeeRepository: EmployeeRepository) {
+class EmployeeController(private val employeeRepository: EmployeeRepository,
+    private val emplLeaveRepository: EmployeeLeaveRepository,
+    private val employeeAttendanceRepository: EmployeeAttendanceRepository) {
+    @Autowired
+    lateinit var payrollRepository: PayrollRepository
+
+    @Autowired
+    lateinit var employeeSkillRepository: EmployeeSkillRepository
 
     @GetMapping
     fun getAllEmployees(): List<Employee> = employeeRepository.findAll()
@@ -52,6 +62,12 @@ class EmployeeController(private val employeeRepository: EmployeeRepository) {
     @DeleteMapping("/{id}")
     fun deleteEmployee(@PathVariable id: Long): ResponseEntity<Void> =
         employeeRepository.findById(id).map { employee ->
+            print("Employee found $employee and deleted")
+
+            employeeAttendanceRepository.deleteByEmployee(employee)
+            emplLeaveRepository.deleteByEmployee(employee)
+            payrollRepository.deleteByEmployee(employee)
+            employeeSkillRepository.deleteByEmployee(employee)
             employeeRepository.delete(employee)
             ResponseEntity<Void>(HttpStatus.NO_CONTENT)
         }.orElse(ResponseEntity.notFound().build())

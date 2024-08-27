@@ -1,5 +1,6 @@
 package com.pranit.emp.empdb.entity
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -7,6 +8,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import java.time.LocalDate
 import java.util.Date
 
@@ -36,6 +38,12 @@ data class Employee(
     @ManyToOne
     @JoinColumn(name = "manager_id")
     val manager: Employee? = null,
+
+    /*@OneToMany(mappedBy = "employee", cascade = [CascadeType.ALL])
+    val attendanceRecords: List<EmployeeAttendance> = mutableListOf(),
+
+    @OneToMany(mappedBy = "employee", cascade = [CascadeType.ALL])
+    val leaves: List<EmployeeLeave> = mutableListOf(),*/
 
     @Column(name = "salary", nullable = false)
     var salary: Double,)
